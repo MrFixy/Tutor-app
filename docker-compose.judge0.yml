@@ -1,0 +1,53 @@
+# Self-hosted Judge0 (Week 7 deliverable), kept in its own compose file
+# and its own Postgres/Redis -- deliberately NOT merged into the main
+# docker-compose.yml, so it doesn't collide with the tutor app's own
+# `postgres` service or get started by `docker compose up` by accident
+# (Judge0's workers run submitted code, so bring it up deliberately).
+#
+# Usage:
+#   cp judge0.conf.example judge0.conf   # then set a real REDIS_PASSWORD
+#   docker compose -f docker-compose.judge0.yml up -d
+#   curl http://localhost:2358/languages   # smoke test
+#
+# Reference: https://github.com/judge0/judge0 (self-hosting docs)
+
+x-judge0-service: &judge0-service
+  image: judge0/judge0:1.13.0
+  env_file: judge0.conf
+  privileged: true
+  restart: unless-stopped
+  depends_on:
+    - db
+    - redis
+
+services:
+  server:
+    <<: *judge0-service
+    ports:
+      - "2358:2358"
+
+  workers:
+    <<: *judge0-service
+    command: ["./scripts/workers"]
+
+  db:
+    image: postgres:16.2
+    container_name: judge0_db
+    restart: unless-stopped
+    env_file: judge0.conf
+    volumes:
+      - judge0_data:/var/lib/postgresql/data/
+
+  redis:
+    image: redis:7.2.4
+    container_name: judge0_redis
+    restart: unless-stopped
+    # Expand $REDIS_PASSWORD inside the container (from env_file below) rather
+    # than via Compose's own ${...} substitution, which only reads the host
+    # shell/.env and would silently fall back to a default, out of sync with
+    # what the server/workers containers authenticate with.
+    command: ["sh", "-c", "redis-server --appendonly yes --requirepass \"$$REDIS_PASSWORD\""]
+    env_file: judge0.conf
+
+volumes:
+  judge0_data:
