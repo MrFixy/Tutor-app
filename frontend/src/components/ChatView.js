@@ -93,6 +93,7 @@ export function ChatView() {
 
   return html`
     <div class="content" style="display:flex; flex-direction:column; height:100%;">
+      <div class="eyebrow"><span class="dot" />SESSION #${sessionId.value} <b>POST /chat</b></div>
       <h1>Ask something</h1>
       <p class="helptext" style="margin-bottom:18px;">
         A stats or coding question, in your own words. The tutor figures out the topic and pitches the

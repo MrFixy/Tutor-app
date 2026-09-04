@@ -40,7 +40,8 @@ export function Plans() {
 
   return html`
     <div class="content">
-      <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div class="eyebrow"><span class="dot" />GET /plans/${userId.value} <b>Real-time Sync</b></div>
+      <div class="content-header">
         <h1>My plans</h1>
         <button class="ghost" onClick=${load} disabled=${loading}>${loading ? html`<span class="spinner" />` : 'Refresh'}</button>
       </div>

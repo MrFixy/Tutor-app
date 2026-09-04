@@ -2,6 +2,7 @@ import { html, useEffect } from '../lib.js';
 import { username, view, health } from '../store.js';
 import { api } from '../api.js';
 import { Login } from './Login.js';
+import { Topbar } from './Topbar.js';
 import { Sidebar } from './Sidebar.js';
 import { Dashboard } from './Dashboard.js';
 import { Lessons } from './Lessons.js';
@@ -37,10 +38,13 @@ export function App() {
   const Screen = VIEWS[view.value] || Dashboard;
 
   return html`
-    <div class="shell">
-      <${Sidebar} />
-      <div class="main">
-        <${Screen} />
+    <div class="app-shell">
+      <${Topbar} />
+      <div class="shell">
+        <${Sidebar} />
+        <div class="main">
+          <${Screen} />
+        </div>
       </div>
       <${FeedbackWidget} />
     </div>

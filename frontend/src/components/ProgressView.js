@@ -5,6 +5,12 @@ import { DomainBadge, DifficultyBadge } from './Badge.js';
 import { ErrorBanner } from './ErrorBanner.js';
 import { SkeletonMastery } from './Skeleton.js';
 
+function barColor(pct) {
+  if (pct >= 70) return 'var(--success)';
+  if (pct >= 40) return 'var(--warn)';
+  return 'var(--danger)';
+}
+
 export function ProgressView() {
   const [rows, setRows] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,7 +35,8 @@ export function ProgressView() {
 
   return html`
     <div class="content">
-      <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div class="eyebrow"><span class="dot" />GET /mastery/${userId.value} <b>Bayesian IRL v4.2</b></div>
+      <div class="content-header">
         <h1>Progress</h1>
         <button class="ghost" onClick=${load} disabled=${loading}>${loading ? html`<span class="spinner" />` : 'Refresh'}</button>
       </div>
@@ -54,7 +61,7 @@ export function ProgressView() {
                 <${DomainBadge} domain=${r.domain} />
                 <${DifficultyBadge} difficulty=${r.difficulty} />
               </div>
-              <div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(r.score * 100)}%"></div></div>
+              <div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(r.score * 100)}%; background:${barColor(r.score * 100)};"></div></div>
               <div class="pct">${Math.round(r.score * 100)}%</div>
             </div>
           `

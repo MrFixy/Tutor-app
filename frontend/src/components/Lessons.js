@@ -77,6 +77,7 @@ export function Lessons() {
 
   return html`
     <div class="content">
+      <div class="eyebrow"><span class="dot" />GET /lessons <b>Structured Theory</b></div>
       <h1>Lessons</h1>
       <div class="breadcrumbs">
         ${crumbs.map(

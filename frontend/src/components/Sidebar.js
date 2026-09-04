@@ -1,22 +1,51 @@
-import { html, useState } from '../lib.js';
-import { view, health, username, logOut } from '../store.js';
+import { html, useState, useEffect } from '../lib.js';
+import { view, health, username, userId, logOut } from '../store.js';
+import { api } from '../api.js';
 import { SettingsModal } from './SettingsModal.js';
+import { IconHome, IconChat, IconTarget, IconBook, IconChecklist, IconChart } from '../icons.js';
 
 const ITEMS = [
-  { id: 'dashboard', label: 'Dashboard' },
-  { id: 'lessons', label: 'Lessons' },
-  { id: 'plans', label: 'My plans' },
-  { id: 'chat', label: 'Tutor' },
-  { id: 'practice', label: 'Practice' },
+  { id: 'dashboard', label: 'Dashboard', icon: IconHome },
+  { id: 'chat', label: 'Tutor', icon: IconChat },
+  { id: 'practice', label: 'Practice', icon: IconTarget },
+  { id: 'lessons', label: 'Lessons', icon: IconBook },
+  { id: 'plans', label: 'My Plans', icon: IconChecklist },
+  { id: 'progress', label: 'Progress', icon: IconChart },
 ];
 
 function led(ok) {
   return ok === null ? '' : ok ? 'up' : 'down';
 }
 
+function tierFor(pct) {
+  if (pct >= 85) return 'Advanced';
+  if (pct >= 55) return 'Intermediate';
+  return 'Beginner';
+}
+
 export function Sidebar() {
   const [showSettings, setShowSettings] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [masteryPct, setMasteryPct] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!userId.value) return;
+    api
+      .mastery(userId.value)
+      .then((res) => {
+        if (cancelled) return;
+        const rows = res.mastery || [];
+        const pct = rows.length ? Math.round((rows.reduce((s, r) => s + r.score, 0) / rows.length) * 100) : 0;
+        setMasteryPct(pct);
+      })
+      .catch(() => {
+        if (!cancelled) setMasteryPct(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId.value]);
 
   const openSettings = () => {
     setShowMobileMenu(false);
@@ -45,10 +74,6 @@ export function Sidebar() {
 
   return html`
     <nav class="sidebar">
-      <div class="brand">
-        <div class="mark">Tutor</div>
-        <div class="sub">stats &amp; coding</div>
-      </div>
       <div class="nav-scroll">
         ${ITEMS.map(
           (item) => html`
@@ -56,12 +81,21 @@ export function Sidebar() {
               class="nav-item ${view.value === item.id ? 'active' : ''}"
               onClick=${() => (view.value = item.id)}
             >
-              <span class="dot" />
+              <${item.icon} />
               ${item.label}
             </button>
           `
         )}
       </div>
+
+      ${masteryPct !== null &&
+      html`
+        <div class="sidebar-stat">
+          <div class="row">Active Mastery <b>${masteryPct}%</b></div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:${masteryPct}%; background:var(--success);"></div></div>
+          <div class="tier-row"><span>Curriculum Tier</span><span>${tierFor(masteryPct)}</span></div>
+        </div>
+      `}
 
       <div class="sidebar-foot">${footBody}</div>
 

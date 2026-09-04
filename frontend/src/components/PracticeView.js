@@ -15,6 +15,7 @@ export function PracticeView() {
 
   return html`
     <div class="content">
+      <div class="eyebrow"><span class="dot" />NEURAL CALIBRATION <b>Active</b></div>
       <h1>Practice</h1>
       <p class="helptext" style="margin-bottom:18px;">
         Stats questions come as multiple choice. Coding exercises run against real test cases.

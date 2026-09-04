@@ -10,6 +10,18 @@ function avgPct(rows) {
   return Math.round((rows.reduce((s, r) => s + r.score, 0) / rows.length) * 100);
 }
 
+function barColor(pct) {
+  if (pct >= 70) return 'var(--success)';
+  if (pct >= 40) return 'var(--warn)';
+  return 'var(--danger)';
+}
+
+function tierFor(pct) {
+  if (pct >= 85) return 'Advanced';
+  if (pct >= 55) return 'Intermediate';
+  return 'Beginner';
+}
+
 export function Dashboard() {
   const [rows, setRows] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -53,15 +65,31 @@ export function Dashboard() {
     view.value = 'practice';
   };
 
+  const aggregatePct = rows ? avgPct(rows) : 0;
+
   return html`
     <div class="content">
-      <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div class="eyebrow">
+        <span class="dot" />
+        TELEMETRY :: GET /mastery/${userId.value} <b>${loading ? 'Syncing...' : 'Live Model Synced'}</b>
+      </div>
+      <div class="content-header">
         <h1>Dashboard</h1>
         <button class="ghost" onClick=${load} disabled=${loading}>${loading ? html`<span class="spinner" />` : 'Refresh'}</button>
       </div>
-      <p class="helptext" style="margin-bottom:18px;">Where you stand across stats and coding, at a glance.</p>
 
       ${error && html`<${ErrorBanner} message=${error} onRetry=${load} retrying=${loading} />`}
+
+      <div class="card hero-card">
+        <div class="hero-copy">
+          <h3 style="text-transform:uppercase; font-size:11px; letter-spacing:0.05em; color:var(--text-dim);">Aggregate Mastery</h3>
+          <h1 style="margin-top:2px;">${rows ? tierFor(aggregatePct) : '\u2013'} Tier</h1>
+          <p>Your dynamic mastery snapshot across every stats and coding subtopic you've practiced.</p>
+        </div>
+        <div class="ring" style="--pct:${rows ? aggregatePct : 0}; --ring-color:${barColor(aggregatePct)};">
+          <div class="ring-value">${rows ? `${aggregatePct}%` : '\u2013'}</div>
+        </div>
+      </div>
 
       <div class="metric-grid">
         <div class="card metric-card">
@@ -80,7 +108,8 @@ export function Dashboard() {
 
       <div class="dashboard-row">
         <div class="card" style="flex: 1 1 55%;">
-          <h3>Mastery by subtopic</h3>
+          <h3>Subtopic Competency Vectors</h3>
+          <p class="helptext" style="margin-bottom:14px;">Continuous mastery tracking across your active subtopics.</p>
           ${loading && !rows && html`<${SkeletonMastery} count=${4} />`}
           ${rows && rows.length === 0 && html`<div class="mastery-empty">No attempts yet. Ask the Tutor something, then practice it.</div>`}
           ${rows &&
@@ -92,7 +121,7 @@ export function Dashboard() {
                   <${DomainBadge} domain=${r.domain} />
                   <${DifficultyBadge} difficulty=${r.difficulty} />
                 </div>
-                <div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(r.score * 100)}%"></div></div>
+                <div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(r.score * 100)}%; background:${barColor(r.score * 100)};"></div></div>
                 <div class="pct">${Math.round(r.score * 100)}%</div>
               </div>
             `

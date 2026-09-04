@@ -19,7 +19,7 @@ export function DifficultyBadge({ difficulty }) {
 }
 
 const STATUS_LABEL = { not_started: 'Not started', in_progress: 'In progress', mastered: 'Mastered' };
-const STATUS_CLASS = { not_started: 'neutral', in_progress: 'difficulty', mastered: 'stats' };
+const STATUS_CLASS = { not_started: 'neutral', in_progress: 'difficulty', mastered: 'success' };
 
 export function StatusBadge({ status }) {
   if (!status) return null;
