@@ -198,6 +198,23 @@ def list_coding_languages(db: Session) -> list[str]:
     return _known_languages(db)
 
 
+def list_phase_groups(db: Session) -> list[str]:
+    """Distinct AI Engineering phase slugs in source curriculum order."""
+    rows = (
+        db.query(models.LessonContent.language)
+        .filter_by(domain="phases")
+        .filter(models.LessonContent.language.isnot(None))
+        .distinct()
+        .all()
+    )
+    return sorted({r[0] for r in rows if r[0]}, key=_phase_sort_key)
+
+
+def _phase_sort_key(slug: str) -> tuple[int, str]:
+    prefix, _, remainder = slug.partition("-")
+    return (int(prefix) if prefix.isdigit() else 9999, remainder)
+
+
 def create_plan(db: Session, user_id: int, goal_text: str, topics: list[GoalTopicItem]) -> StudyPlanOut:
     plan = models.StudyPlan(user_id=user_id, goal_text=goal_text)
     db.add(plan)

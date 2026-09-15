@@ -266,12 +266,16 @@ async def list_lessons(domain: str, user_id: int, language: Optional[str] = None
     Statistics tab: GET /lessons/stats -> list[LessonListItem] (subtopic
     grid, status joined from mastery_score).
 
-    Programming tab, two steps:
+        Programming and AI Engineering tabs, two steps:
       GET /lessons/coding (no language)      -> {"languages": [...]}
       GET /lessons/coding?language=python    -> list[LessonListItem]
+            GET /lessons/phases (no language)      -> {"languages": [...]}
+            GET /lessons/phases?language=...      -> list[LessonListItem]
     """
-    if domain == "coding" and language is None:
+    if language is None and domain == "coding":
         return {"languages": study_plan.list_coding_languages(db)}
+    if language is None and domain == "phases":
+        return {"languages": study_plan.list_phase_groups(db)}
     return study_plan.list_lesson_items(db, user_id, domain, language)
 
 

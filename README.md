@@ -44,6 +44,8 @@ straight to [Getting started](#getting-started).
   advanced material next.
 - **A working frontend** (chat, practice, progress dashboard) with no
   build step required.
+- **Guides** with Statistics, Programming, and the read-only AI Engineering
+  curriculum, organized by topic, language, and phase.
 - **Pilot-ready backend**: health checks, an optional hosted-API
   fallback for outages, an in-app feedback widget, and a deployment
   guide for running this with real learners on a LAN.

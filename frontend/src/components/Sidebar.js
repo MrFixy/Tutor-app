@@ -8,7 +8,7 @@ const ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: IconHome },
   { id: 'chat', label: 'Tutor', icon: IconChat },
   { id: 'practice', label: 'Practice', icon: IconTarget },
-  { id: 'lessons', label: 'Lessons', icon: IconBook },
+  { id: 'lessons', label: 'Guides', icon: IconBook },
   { id: 'plans', label: 'My Plans', icon: IconChecklist },
   { id: 'progress', label: 'Progress', icon: IconChart },
 ];

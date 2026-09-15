@@ -61,6 +61,12 @@ def _iter_lesson_files():
             for path in sorted(lang_dir.glob("*.md")):
                 yield "coding", path.stem, lang_dir.name, path
 
+    phases_dir = CONTENT_ROOT / "phases"
+    if phases_dir.is_dir():
+        for phase_dir in sorted(p for p in phases_dir.iterdir() if p.is_dir()):
+            for path in sorted(phase_dir.glob("*.md")):
+                yield "phases", f"{phase_dir.name}__{path.stem}", phase_dir.name, path
+
 
 def load_lessons_from_disk(db: Session) -> int:
     """Upserts every content/lessons/**.md file into LessonContent, keyed
