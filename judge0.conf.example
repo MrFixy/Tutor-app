@@ -1,0 +1,25 @@
+# Copy this file to `judge0.conf` (gitignored) and change the passwords
+# before running `docker compose -f docker-compose.judge0.yml up -d`.
+# Full option reference: https://github.com/judge0/judge0/blob/master/judge0.conf
+
+# --- Postgres (used by the `db` service and the Judge0 server/workers) ---
+POSTGRES_DB=judge0
+POSTGRES_USER=judge0
+POSTGRES_PASSWORD=change_me_judge0_db
+DATABASE_URL=postgres://judge0:change_me_judge0_db@db:5432/judge0
+
+# --- Redis (used by the `redis` service and the Judge0 server/workers) ---
+# Judge0 reads these as separate variables, not a combined URL -- REDIS_HOST
+# defaults to `localhost` if unset, which won't resolve from inside the
+# server/workers containers, so it must be set explicitly to `redis` (the
+# service name on the Docker network).
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PASSWORD=change_me_judge0_redis
+
+# --- Server ---
+# How many submissions can queue before /submissions starts rejecting.
+MAX_QUEUE_SIZE=100
+# Keep this OFF on a local/dev box unless you've hardened the instance --
+# this server executes arbitrary submitted code.
+ENABLE_WAIT_RESULT=true
