@@ -1,70 +1,36 @@
-# Week 13 Pilot Exit Survey
+# AI Engineering Tutor — Pilot Feedback
 
-Given to each pilot learner at the end of Week 13, after they've had at
-least a few sessions across chat, practice, and progress. Pairs with the
-in-app feedback widget (`frontend/src/components/FeedbackWidget.js`),
-which captures issues *as they happen*; this survey captures the
-after-the-fact, whole-experience view once the friction of the moment
-has faded and they can compare sessions.
+Use this after a learner has spent time with the AI Tutor, Guides, and My Plans. The goal is to check whether the focused AI Engineering experience is useful and whether the curriculum and tutor work together clearly.
 
-Keep it short enough to finish in 5 minutes — long surveys get abandoned
-or rushed. Everything free-text is intentional: category counts already
-come from the `feedback` table, so this is for the texture numbers can't
-give.
+## 1. Overall experience
 
-## How to send it
+- How useful was the app for learning AI Engineering? (1 = not useful, 5 = very useful)
+- Was it clear that the app focuses on AI Engineering rather than general programming or general statistics?
+- What felt most useful? What felt unnecessary or distracting?
 
-Plain form (Google Form / Typeform / paper, whatever's lowest-friction
-for this cohort) rather than another in-app screen — a learner who is
-frustrated with the app is not the ideal audience for "please open the
-app again to tell us about your frustration."
+## 2. AI Tutor
 
-## Questions
+- Did the tutor explain AI/ML concepts at the right level?
+- Were explanations accurate, structured, and easy to follow?
+- Were Python examples and mathematical foundations helpful when used in an AI/ML context?
+- Did the tutor handle questions outside AI Engineering appropriately?
+- What questions produced a weak, vague, or incorrect answer?
 
-### 1. Overall
+## 3. Guides curriculum
 
-- On a scale of 1–5, how likely are you to keep using this to study
-  stats/coding? (1 = not at all, 5 = definitely)
-- What's the single biggest reason for that score?
+- Was the six-volume structure easy to navigate?
+- Could you find the lesson you expected?
+- Were lesson depth, examples, and prerequisites appropriate?
+- Which phases or lessons are missing, duplicated, or out of order?
 
-### 2. Chat & explanations
+## 4. Goal-based roadmaps
 
-- Did the tutor correctly understand what you were asking (stats vs.
-  coding, right subtopic)? Any examples where it got confused?
-- Were explanations pitched at the right level — too basic, too
-  advanced, or about right?
+- Did the suggested phases match your stated learning or project goal?
+- Were the phases in a sensible prerequisite-to-advanced order?
+- Was saving and reopening a roadmap useful?
 
-### 3. Practice (quizzes & coding exercises)
+## 5. Reliability and usability
 
-- Did the difficulty feel right for where you are, or did it feel
-  off (too easy / too hard) at any point?
-- For coding exercises specifically: any issues with the editor,
-  running your code, or reading the test results?
-
-### 4. Progress / mastery view
-
-- Did the mastery bars feel like an accurate reflection of what you
-  actually know? Any subtopic where the score surprised you?
-
-### 5. Speed & reliability
-
-- Did you ever hit a point where the app felt stuck, slow, or
-  unresponsive? What were you doing at the time?
-- Did you see the "can't reach the API" or similar error message?
-  How did you handle it (retried, gave up, waited)?
-
-### 6. Rough edges (open-ended)
-
-- What was the single most annoying thing about using this app?
-- Was there anything you expected the app to do that it couldn't?
-
-### 7. Anything else
-
-- Anything else you'd want us to know before the next round?
-
-## After collecting responses
-
-Group answers under the same `bug` / `ux_friction` / `other` buckets
-used by the in-app feedback widget so the two sources roll up together,
-then weigh both against the "Known rough edges" list in `README.md`
-before deciding what Week 14 polish actually goes after.
+- Did chat, lesson loading, and saved plans work reliably?
+- Were there confusing screens, slow responses, or visible errors?
+- What one change would most improve the experience?

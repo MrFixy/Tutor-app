@@ -1,23 +1,8 @@
-"""
-Phase 6 / Week 14 — pilot bug fix (found during pre-pilot smoke testing,
-before Week 13 recruiting, so it never actually hit a pilot learner).
+"""Create the user and session rows referenced by chat and feedback writes.
 
-Weeks 1-12 never inserted a row into `users` or `sessions` anywhere.
-Login.js/store.js only *invent* a client-side user_id (hash of the
-username) and session_id (Date.now()), and /chat + /practice/*/generate
-wrote `questions` rows referencing those ids directly. Both columns are
-real foreign keys (`users.id`, `sessions.id`); against the real Postgres
-schema (not sqlite, which doesn't enforce FKs by default) the very first
-`/chat` call from a fresh username raises an IntegrityError and the
-request 500s. Caught with a local Postgres run before Week 13, not by a
-pilot learner's first message -- but it's exactly the kind of thing the
-Week 13 survey was designed to catch, so it's logged here as a bug fix
-rather than quietly folded in.
-
-get_or_create_user / get_or_create_session make the DB self-healing for
-these client-generated ids: reuse the row if it already exists, insert it
-with the given id if not. Call both before any write that references
-user_id/session_id.
+The frontend generates stable pilot user IDs and per-session IDs. These
+helpers ensure the matching foreign-key rows exist before the API stores
+chat history or feedback.
 """
 from typing import Optional
 

@@ -1,6 +1,6 @@
 """
 Phase 6 / Week 14 -- regression test for the bug described in
-app/user_service.py: /chat and /practice/*/generate wrote `questions` rows
+app/user_service.py: /chat wrote `questions` rows
 referencing client-generated user_id/session_id values with no matching
 row in `users`/`sessions`, which violates their FK constraints against a
 real Postgres schema. No live services needed: only the two tables under
