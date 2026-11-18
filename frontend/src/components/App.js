@@ -8,21 +8,19 @@ import { Dashboard } from './Dashboard.js';
 import { Lessons } from './Lessons.js';
 import { Plans } from './Plans.js';
 import { ChatView } from './ChatView.js';
-import { PracticeView } from './PracticeView.js';
-import { ProgressView } from './ProgressView.js';
 import { FeedbackWidget } from './FeedbackWidget.js';
 
-const VIEWS = { dashboard: Dashboard, lessons: Lessons, plans: Plans, chat: ChatView, practice: PracticeView, progress: ProgressView };
+const VIEWS = { dashboard: Dashboard, lessons: Lessons, plans: Plans, chat: ChatView };
 
 export function App() {
   useEffect(() => {
     let cancelled = false;
     const poll = async () => {
       try {
-        const res = await api.health();
-        if (!cancelled) health.value = res;
+        const result = await api.health();
+        if (!cancelled) health.value = result;
       } catch {
-        if (!cancelled) health.value = { ollama_ok: false, judge0_ok: false };
+        if (!cancelled) health.value = { ollama_ok: false };
       }
     };
     poll();
@@ -34,17 +32,13 @@ export function App() {
   }, []);
 
   if (!username.value) return html`<${Login} />`;
-
-  const Screen = VIEWS[view.value] || Dashboard;
-
+  const ActiveScreen = VIEWS[view.value] || Dashboard;
   return html`
     <div class="app-shell">
       <${Topbar} />
       <div class="shell">
         <${Sidebar} />
-        <div class="main">
-          <${Screen} />
-        </div>
+        <div class="main"><${ActiveScreen} /></div>
       </div>
       <${FeedbackWidget} />
     </div>

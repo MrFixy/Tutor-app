@@ -8,13 +8,6 @@ class Settings(BaseSettings):
     ollama_timeout: int = 120
     app_env: str = "dev"
 
-    # Phase 3 / Week 7-8: self-hosted Judge0 (docker-compose.judge0.yml)
-    judge0_url: str = "http://localhost:2358"
-    judge0_timeout: int = 30
-    # Judge0 CE language id for Python 3. See:
-    # GET {judge0_url}/languages to confirm on your instance.
-    judge0_python_language_id: int = 71
-
     # Phase 6 / Week 14: latency tuning. A single local Ollama instance
     # (one GPU, one loaded model) doesn't parallelize across requests --
     # letting several pilot learners hit /chat at once just makes every

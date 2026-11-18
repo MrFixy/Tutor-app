@@ -3,8 +3,8 @@ Thin wrapper around Ollama's local HTTP API (http://localhost:11434).
 
 Kept as a small isolated module so that Week 6's swap to llama.cpp/vLLM
 (for real prompt-caching support) only requires rewriting this file --
-everything upstream (classifier.py, explain.py, quiz.py, code_exercise.py)
-talks to generate()/generate_json(), not to Ollama's wire format directly.
+the AI tutor and goal-planning services talk to generate()/generate_json(),
+not to Ollama's wire format directly.
 That same isolation is what let Phase 6 add connection pooling, a
 concurrency cap, and an optional hosted-API fallback here without
 touching any caller.

@@ -7,32 +7,24 @@ function initial(name) {
 }
 
 export function Topbar() {
-  const loopUp = health.value.ollama_ok && health.value.judge0_ok;
-  const loopDown = health.value.ollama_ok === false || health.value.judge0_ok === false;
-  const loopLabel = loopUp ? 'Active' : loopDown ? 'Degraded' : 'Checking';
-  const loopCls = loopUp ? 'up' : loopDown ? 'down' : '';
+  const status = health.value.ollama_ok === null ? 'Checking' : health.value.ollama_ok ? 'Active' : 'Unavailable';
+  const statusClass = health.value.ollama_ok === null ? '' : health.value.ollama_ok ? 'up' : 'down';
 
   return html`
     <header class="topbar">
       <div class="topbar-brand">
         <div class="brand-mark"><${IconLogoMark} /></div>
         <div>
-          <div class="brand-name">Stats &amp; Code Tutor</div>
-          <div class="brand-sub">adaptive learning pilot</div>
+          <div class="brand-name">AI Engineering Tutor</div>
+          <div class="brand-sub">learn · understand · build</div>
         </div>
-        <span class="beta-pill">ADAPTIVE AI BETA</span>
+        <span class="beta-pill">AI ENGINEERING</span>
       </div>
       <div class="topbar-right">
-        <div class="loop-status">
-          <span class="led ${loopCls}" />
-          Adaptive Loop: <b>${loopLabel}</b>
-        </div>
+        <div class="loop-status"><span class="led ${statusClass}" /> AI model: <b>${status}</b></div>
         <div class="topbar-divider" />
         <div class="user-chip">
-          <div class="who">
-            <div class="name">${username.value}</div>
-            <div class="tag-line">Pilot Learner</div>
-          </div>
+          <div class="who"><div class="name">${username.value}</div><div class="tag-line">Learner</div></div>
           <div class="avatar">${initial(username.value)}</div>
         </div>
       </div>

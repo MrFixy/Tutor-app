@@ -1,7 +1,4 @@
-"""Import AI Engineering from Scratch lesson markdown into Tutor.
-
-TODO: Import lesson code and outputs in a separate feature once the UI supports them.
-"""
+"""Import AI Engineering from Scratch lesson Markdown into the Tutor."""
 from __future__ import annotations
 
 import argparse

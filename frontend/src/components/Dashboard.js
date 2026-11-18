@@ -1,29 +1,10 @@
 import { html, useState, useEffect } from '../lib.js';
 import { api, ApiError } from '../api.js';
-import { userId, plans, view, practicePrefill } from '../store.js';
-import { DomainBadge, DifficultyBadge } from './Badge.js';
+import { plans, view, userId, lessonsBreadcrumb } from '../store.js';
 import { ErrorBanner } from './ErrorBanner.js';
-import { SkeletonMastery } from './Skeleton.js';
-
-function avgPct(rows) {
-  if (!rows.length) return 0;
-  return Math.round((rows.reduce((s, r) => s + r.score, 0) / rows.length) * 100);
-}
-
-function barColor(pct) {
-  if (pct >= 70) return 'var(--success)';
-  if (pct >= 40) return 'var(--warn)';
-  return 'var(--danger)';
-}
-
-function tierFor(pct) {
-  if (pct >= 85) return 'Advanced';
-  if (pct >= 55) return 'Intermediate';
-  return 'Beginner';
-}
 
 export function Dashboard() {
-  const [rows, setRows] = useState(null);
+  const [curriculum, setCurriculum] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -31,48 +12,35 @@ export function Dashboard() {
     setLoading(true);
     setError(null);
     try {
-      const [masteryRes, plansRes] = await Promise.all([api.mastery(userId.value), api.getPlans(userId.value)]);
-      setRows(masteryRes.mastery);
-      plans.value = plansRes.plans;
+      const [curriculumResponse, plansResponse] = await Promise.all([
+        fetch('./content/curriculum.json').then((response) => {
+          if (!response.ok) throw new Error('Could not load the AI Engineering curriculum.');
+          return response.json();
+        }),
+        api.getPlans(userId.value),
+      ]);
+      setCurriculum(curriculumResponse);
+      plans.value = plansResponse.plans;
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not load your dashboard.');
+      setError(err instanceof ApiError ? err.message : err.message || 'Could not load the dashboard.');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
-  const statsRows = (rows || []).filter((r) => r.domain === 'stats');
-  const codingRows = (rows || []).filter((r) => r.domain === 'coding');
-  const totalAttempts = (rows || []).reduce((s, r) => s + r.attempts_count, 0);
-
-  // "Continue": the subtopic with the most practice history that hasn't
-  // been mastered yet, if any -- otherwise nothing to suggest.
-  const continueRow = (rows || [])
-    .filter((r) => r.attempts_count > 0 && r.score < 0.75)
-    .sort((a, b) => b.attempts_count - a.attempts_count)[0];
-
-  const topPlan = plans.value[0];
-  const topPlanPct = topPlan
-    ? Math.round((topPlan.items.filter((i) => i.status === 'mastered').length / (topPlan.items.length || 1)) * 100)
-    : null;
-
-  const goToPractice = (row) => {
-    practicePrefill.value = { domain: row.domain, subtopic: row.subtopic, difficulty: row.difficulty };
-    view.value = 'practice';
+  const phaseCount = curriculum?.length || 0;
+  const lessonCount = (curriculum || []).reduce((total, phase) => total + phase.lessons.length, 0);
+  const latestPlan = plans.value[0];
+  const openGuides = () => {
+    lessonsBreadcrumb.value = null;
+    view.value = 'lessons';
   };
-
-  const aggregatePct = rows ? avgPct(rows) : 0;
 
   return html`
     <div class="content">
-      <div class="eyebrow">
-        <span class="dot" />
-        TELEMETRY :: GET /mastery/${userId.value} <b>${loading ? 'Syncing...' : 'Live Model Synced'}</b>
-      </div>
+      <div class="eyebrow"><span class="dot" />YOUR AI ENGINEERING WORKSPACE <b>${loading ? 'Loading' : 'Ready'}</b></div>
       <div class="content-header">
         <h1>Dashboard</h1>
         <button class="ghost" onClick=${load} disabled=${loading}>${loading ? html`<span class="spinner" />` : 'Refresh'}</button>
@@ -80,78 +48,32 @@ export function Dashboard() {
 
       ${error && html`<${ErrorBanner} message=${error} onRetry=${load} retrying=${loading} />`}
 
-      <div class="card hero-card">
-        <div class="hero-copy">
-          <h3 style="text-transform:uppercase; font-size:11px; letter-spacing:0.05em; color:var(--text-dim);">Aggregate Mastery</h3>
-          <h1 style="margin-top:2px;">${rows ? tierFor(aggregatePct) : '\u2013'} Tier</h1>
-          <p>Your dynamic mastery snapshot across every stats and coding subtopic you've practiced.</p>
+      <section class="course-intro dashboard-intro">
+        <div class="course-intro-copy">
+          <span class="course-kicker">ONE FOCUSED PATH</span>
+          <h1>Learn <em>AI Engineering</em></h1>
+          <p>Build understanding from mathematical foundations and machine learning through deep learning, LLMs, agents, and production systems.</p>
+          <button class="primary" onClick=${openGuides}>Explore the curriculum →</button>
         </div>
-        <div class="ring" style="--pct:${rows ? aggregatePct : 0}; --ring-color:${barColor(aggregatePct)};">
-          <div class="ring-value">${rows ? `${aggregatePct}%` : '\u2013'}</div>
+        <div class="course-stats" aria-label="Curriculum overview">
+          <span><b>▣</b><strong>6</strong><small>volumes</small></span>
+          <span><b>▱</b><strong>${phaseCount || '—'}</strong><small>phases</small></span>
+          <span><b>▥</b><strong>${lessonCount || '—'}</strong><small>lessons</small></span>
         </div>
-      </div>
-
-      <div class="metric-grid">
-        <div class="card metric-card">
-          <div class="metric-label">Stats mastery</div>
-          <div class="metric-value">${rows ? `${avgPct(statsRows)}%` : '\u2013'}</div>
-        </div>
-        <div class="card metric-card">
-          <div class="metric-label">Coding mastery</div>
-          <div class="metric-value">${rows ? `${avgPct(codingRows)}%` : '\u2013'}</div>
-        </div>
-        <div class="card metric-card">
-          <div class="metric-label">Practice attempts</div>
-          <div class="metric-value">${rows ? totalAttempts : '\u2013'}</div>
-        </div>
-      </div>
+        <div class="course-scribble" aria-hidden="true">Learn<br />Build<br />Grow</div>
+      </section>
 
       <div class="dashboard-row">
         <div class="card" style="flex: 1 1 55%;">
-          <h3>Subtopic Competency Vectors</h3>
-          <p class="helptext" style="margin-bottom:14px;">Continuous mastery tracking across your active subtopics.</p>
-          ${loading && !rows && html`<${SkeletonMastery} count=${4} />`}
-          ${rows && rows.length === 0 && html`<div class="mastery-empty">No attempts yet. Ask the Tutor something, then practice it.</div>`}
-          ${rows &&
-          rows.map(
-            (r) => html`
-              <div class="mastery-row">
-                <div class="name">
-                  <div class="sub">${r.subtopic.replaceAll('_', ' ')}</div>
-                  <${DomainBadge} domain=${r.domain} />
-                  <${DifficultyBadge} difficulty=${r.difficulty} />
-                </div>
-                <div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(r.score * 100)}%; background:${barColor(r.score * 100)};"></div></div>
-                <div class="pct">${Math.round(r.score * 100)}%</div>
-              </div>
-            `
-          )}
+          <h3>Start with the AI Tutor</h3>
+          <p class="helptext">Ask about machine learning, deep learning, computer vision, NLP, transformers, generative AI, LLM systems, agents, or the math and Python that support them.</p>
+          <button class="primary" onClick=${() => (view.value = 'chat')}>Ask the Tutor →</button>
         </div>
-
-        <div style="flex: 1 1 40%; display:flex; flex-direction:column; gap:16px;">
-          <div class="card">
-            <h3>My plans</h3>
-            ${topPlan
-              ? html`
-                  <p class="sub" style="margin:0 0 6px;">${topPlan.goal_text}</p>
-                  <div class="bar-wrap"><div class="bar-fill" style="width:${topPlanPct}%"></div></div>
-                  <p class="pct" style="margin:6px 0 12px;">${topPlanPct}% complete</p>
-                `
-              : html`<p class="helptext">No saved plans yet.</p>`}
-            <button class="ghost" onClick=${() => (view.value = 'plans')}>View all plans &rarr;</button>
-          </div>
-
-          <div class="card">
-            <h3>Continue</h3>
-            ${continueRow
-              ? html`
-                  <p class="sub" style="margin:0 0 10px;">
-                    ${continueRow.subtopic.replaceAll('_', ' ')} (${Math.round(continueRow.score * 100)}%)
-                  </p>
-                  <button class="primary" onClick=${() => goToPractice(continueRow)}>Practice this &rarr;</button>
-                `
-              : html`<p class="helptext">Nothing in progress yet -- ask the Tutor a question to get started.</p>`}
-          </div>
+        <div class="card" style="flex: 1 1 40%;">
+          <h3>My latest roadmap</h3>
+          ${latestPlan
+            ? html`<p class="sub">${latestPlan.goal_text}</p><p class="helptext">${latestPlan.items.length} AI Engineering phases</p><button class="ghost" onClick=${() => (view.value = 'plans')}>Open my plans →</button>`
+            : html`<p class="helptext">No saved roadmaps yet. Tell the Tutor what you want to learn or build, then save the suggested phases.</p><button class="ghost" onClick=${() => (view.value = 'chat')}>Create a roadmap →</button>`}
         </div>
       </div>
     </div>

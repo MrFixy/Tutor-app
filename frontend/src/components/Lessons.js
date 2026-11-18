@@ -27,6 +27,16 @@ function volumeRange(volume) {
   return `${String(volume.from).padStart(2, '0')}—${String(volume.to).padStart(2, '0')}`;
 }
 
+export function volumeIdForPhase(phaseSlug) {
+  const match = phaseSlug?.match(/^(\d+)-/);
+  if (!match) return 1;
+  const number = Number(match[1]);
+  const volume = VOLUMES.find((item) =>
+    item.phases?.includes(number) || (number >= item.from && number <= item.to)
+  );
+  return volume?.id || 1;
+}
+
 export function Lessons() {
   const bc = lessonsBreadcrumb.value;
   const [curriculum, setCurriculum] = useState(null);
@@ -107,7 +117,7 @@ export function Lessons() {
             <h1>Course <em>Volumes</em></h1>
             <p>A structured journey from fundamentals to real-world systems.</p>
           </div>
-          <div class="course-stats" aria-label="Course statistics">
+          <div class="course-stats" aria-label="Curriculum overview">
             <span><b>▣</b><strong>6</strong><small>volumes</small></span>
             <span><b>▱</b><strong>20</strong><small>phases</small></span>
             <span><b>▥</b><strong>1</strong><small>journey</small></span>
